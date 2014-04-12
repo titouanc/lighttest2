@@ -1,4 +1,4 @@
-Lighttest2 is a tiny unit test lib for C/C++.
+Lighttest2 is a tiny unit test lib for C/C++. [![Build Status](https://travis-ci.org/titouanc/lighttest2.svg?branch=master)](https://travis-ci.org/titouanc/lighttest2)
 
 # Why ?
 
