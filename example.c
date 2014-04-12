@@ -9,7 +9,7 @@ TEST(another_test, {
 	int n = 42;
 	PRINT("n=%d", n);
 	ASSERT(n == 42);
-	ASSERT(n == 24);
+	ASSERT(n != 24);
 })
 
 TEST(in_loop, {
