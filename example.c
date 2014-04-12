@@ -5,8 +5,9 @@ TEST(a_test, {
 	ASSERT(! false);
 })
 
-TEST(other_test, {
+TEST(another_test, {
 	int n = 42;
+	PRINT("n=%d", n);
 	ASSERT(n == 42);
 	ASSERT(n == 24);
 })
@@ -21,8 +22,11 @@ TEST(in_loop, {
 	}
 })
 
+TEST(one_instruction, ASSERT(true))
+
 SUITE (
 	ADDTEST(a_test),
-	ADDTEST(other_test),
-	ADDTEST(in_loop)
+	ADDTEST(another_test),
+	ADDTEST(in_loop),
+	ADDTEST(one_instruction)
 )

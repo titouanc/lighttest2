@@ -13,14 +13,14 @@ static struct {
 	bool verbose;
 } __options = {.verbose=false};
 
-#define ASSERT(expr) __assert_cnt++; if (__options.verbose){putchar('.'); fflush(stdout);} if (! (expr)){printf("\033[31mASSERTION "#expr" failed\033[0m (%s:%d)\n", __FILE__, __LINE__); return false;}
-
 #define TEST(name,body) bool name(void){body; return true;}
-
+#define ADDTEST(test) {.name=#test, .func=test}
 typedef bool(*TestFunc)(void);
 typedef struct {const char *name; TestFunc func;} Test;
 
-#define ADDTEST(test) {.name=#test, .func=test}
+#define ASSERT(expr) __assert_cnt++; if (__options.verbose){putchar('.'); fflush(stdout);} if (! (expr)){printf("\033[31mASSERTION "#expr" failed\033[0m (%s:%d)\n", __FILE__, __LINE__); return false;}
+
+#define PRINT(fmt, ...) if (__options.verbose){printf(fmt"\n", ##__VA_ARGS__);}
 
 #define runTests(tests) runTestSuite(tests, sizeof(tests)/sizeof(Test))
 bool runTestSuite(Test *suite, unsigned long int n_tests)
@@ -30,7 +30,6 @@ bool runTestSuite(Test *suite, unsigned long int n_tests)
 		if (__options.verbose){
 			int test_name_len = strlen(suite[i].name);
 			int padding_len = TERMINAL_WIDTH - 10 - test_name_len;
-			printf("\033[1m");
 			for (int i=0; i<padding_len/2; i++)
 				putchar('-');
 			printf(" testing %s ", suite[i].name);
@@ -38,20 +37,20 @@ bool runTestSuite(Test *suite, unsigned long int n_tests)
 				putchar('-');
 			if (padding_len%2)
 				putchar('-');
-			printf("\033[0m\n");
+			putchar('\n');
 		}
 		if (suite[i].func())
 			test_ok++;
 		if (__options.verbose){
-			printf("\n\033[1m");
+			putchar('\n');
 			for (int i=0; i<TERMINAL_WIDTH; i++)
 				putchar('-');
-			printf("\033[0m\n");
+			putchar('\n');
 		}
 	}
-	printf("\033[1mRan %lu tests | \033[32m%lu OK ", n_tests, test_ok);
+	printf("\033[1mRan %lu tests | \033[32m%lu OK", n_tests, test_ok);
 	if (test_ok != n_tests)
-		printf(" \033[31m%lu FAILS ", n_tests - test_ok);
+		printf("  \033[31m%lu FAILS", n_tests - test_ok);
 	printf("\033[0;1m | \033[0m%lu assertions\n", __assert_cnt);
 	printf("\033[1;3%dm", (test_ok == n_tests) ? 2 : 1);
 	for (int i=0; i<TERMINAL_WIDTH; i++)
@@ -78,6 +77,6 @@ void __parseOptions(int argc, const char **argv)
 	}
 }
 
-#define SUITE(tests, ...) int main(int argc, const char **argv){Test suite[] = {tests, ##__VA_ARGS__}; __parseOptions(argc, argv); return runTests(suite) != true;}
+#define SUITE(...) int main(int argc, const char **argv){Test suite[] = {__VA_ARGS__}; __parseOptions(argc, argv); return runTests(suite) != true;}
 
 #endif
