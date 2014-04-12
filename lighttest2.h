@@ -6,7 +6,10 @@
 #include <string.h>
 
 static unsigned long int __assert_cnt = 0;
-static bool __verbose = false;
+static struct {
+	const char *name;
+	bool verbose;
+} __options = {.verbose=false};
 
 #define ASSERT(expr) __assert_cnt++; if (! (expr)){printf("\033[31mASSERTION "#expr" failed\033[0m (%s:%d)\n", __FILE__, __LINE__); return false;}
 
@@ -17,12 +20,12 @@ typedef struct {const char *name; TestFunc func;} Test;
 
 #define ADDTEST(test) {.name=#test, .func=test}
 
-#define runTests(tests, verbose) runTestSuite(tests, sizeof(tests)/sizeof(Test))
+#define runTests(tests) runTestSuite(tests, sizeof(tests)/sizeof(Test))
 bool runTestSuite(Test *suite, unsigned long int n_tests)
 {
 	unsigned long int test_ok = 0;
 	for (unsigned long int i=0; i<n_tests; i++){
-		if (__verbose){
+		if (__options.verbose){
 			int test_name_len = strlen(suite[i].name);
 			int padding_len = 70 - test_name_len;
 			printf("\033[1m");
@@ -37,7 +40,7 @@ bool runTestSuite(Test *suite, unsigned long int n_tests)
 		}
 		if (suite[i].func())
 			test_ok++;
-		if (__verbose){
+		if (__options.verbose){
 			printf("\033[1m");
 			for (int i=0; i<80; i++)
 				putchar('=');
@@ -51,15 +54,24 @@ bool runTestSuite(Test *suite, unsigned long int n_tests)
 	return test_ok == n_tests;
 }
 
-bool lighttest_isVerbose(int argc, const char **argv)
+bool streq(const char *s1, const char *s2)
 {
-	for (int i=1; i<argc; i++){
-		if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--verbose") == 0)
-			return true;
+	while (*s1 && *s2 && *s1 == *s2){
+		s1++;
+		s2++;
 	}
-	return false;
+	return (*s1 == *s2);
 }
 
-#define SUITE(tests, ...) int main(int argc, const char **argv){Test suite[] = {tests, ##__VA_ARGS__}; return runTests(suite, lighttest_isVerbose(argc, argv)) != true;}
+void __parseOptions(int argc, const char **argv)
+{
+	__options.name = argv[0];
+	for (int i=1; i<argc; i++){
+		if (streq(argv[i], "-v") || streq(argv[i], "--verbose"))
+			__options.verbose = true;
+	}
+}
+
+#define SUITE(tests, ...) int main(int argc, const char **argv){Test suite[] = {tests, ##__VA_ARGS__}; __parseOptions(argc, argv); return runTests(suite) != true;}
 
 #endif

@@ -11,7 +11,18 @@ TEST(other_test, {
 	ASSERT(n == 24);
 })
 
+TEST(in_loop, {
+	unsigned char vec[42];
+	for (size_t i=0; i<sizeof(vec); i++){
+		vec[i] = i;
+	}
+	for (size_t i=0; i<sizeof(vec); i++){
+		ASSERT(vec[i] == i);
+	}
+})
+
 SUITE (
 	ADDTEST(a_test),
-	ADDTEST(other_test)
+	ADDTEST(other_test),
+	ADDTEST(in_loop)
 )
