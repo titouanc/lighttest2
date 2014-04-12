@@ -5,13 +5,15 @@
 #include <stdio.h>
 #include <string.h>
 
+#define TERMINAL_WIDTH 80
+
 static unsigned long int __assert_cnt = 0;
 static struct {
 	const char *name;
 	bool verbose;
 } __options = {.verbose=false};
 
-#define ASSERT(expr) __assert_cnt++; if (! (expr)){printf("\033[31mASSERTION "#expr" failed\033[0m (%s:%d)\n", __FILE__, __LINE__); return false;}
+#define ASSERT(expr) __assert_cnt++; if (__options.verbose){putchar('.'); fflush(stdout);} if (! (expr)){printf("\033[31mASSERTION "#expr" failed\033[0m (%s:%d)\n", __FILE__, __LINE__); return false;}
 
 #define TEST(name,body) bool name(void){body; return true;}
 
@@ -27,23 +29,23 @@ bool runTestSuite(Test *suite, unsigned long int n_tests)
 	for (unsigned long int i=0; i<n_tests; i++){
 		if (__options.verbose){
 			int test_name_len = strlen(suite[i].name);
-			int padding_len = 70 - test_name_len;
+			int padding_len = TERMINAL_WIDTH - 10 - test_name_len;
 			printf("\033[1m");
 			for (int i=0; i<padding_len/2; i++)
-				putchar('=');
+				putchar('-');
 			printf(" testing %s ", suite[i].name);
 			for (int i=0; i<padding_len/2; i++)
-				putchar('=');
+				putchar('-');
 			if (padding_len%2)
-				putchar('=');
+				putchar('-');
 			printf("\033[0m\n");
 		}
 		if (suite[i].func())
 			test_ok++;
 		if (__options.verbose){
-			printf("\033[1m");
-			for (int i=0; i<80; i++)
-				putchar('=');
+			printf("\n\033[1m");
+			for (int i=0; i<TERMINAL_WIDTH; i++)
+				putchar('-');
 			printf("\033[0m\n");
 		}
 	}
@@ -51,6 +53,10 @@ bool runTestSuite(Test *suite, unsigned long int n_tests)
 	if (test_ok != n_tests)
 		printf(" \033[31m%lu FAILS ", n_tests - test_ok);
 	printf("\033[0;1m | \033[0m%lu assertions\n", __assert_cnt);
+	printf("\033[1;3%dm", (test_ok == n_tests) ? 2 : 1);
+	for (int i=0; i<TERMINAL_WIDTH; i++)
+		putchar('=');
+	printf("\033[0m\n");
 	return test_ok == n_tests;
 }
 
