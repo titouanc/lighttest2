@@ -1,0 +1,5 @@
+language: c
+script: "make example && ./example -v"
+compiler:
+  - clang
+  - gcc
