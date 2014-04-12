@@ -10,7 +10,7 @@ Note that lighttest is not intended to replace full unittest libraries such as C
 
 # How ?
 
-All you need is to `#include "lighttest2.h"`. It's an easy way to distribute the test lib with a project.
+All you need is to `wget https://raw.githubusercontent.com/titouanc/lighttest2/master/lighttest2.h` then `#include "lighttest2.h"`. It's an easy way to distribute the test lib with a project.
 
 ## The Code
 
