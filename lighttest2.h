@@ -38,7 +38,7 @@ void __parseOptions(int argc, const char **argv)
 
 /* ============ Test creation ============ */
 #define TEST(name,body) bool name(void){body; return true;}
-#define ADDTEST(test) {.name=#test, .func=test}
+#define ADDTEST(test) {#test, test}
 typedef bool(*TestFunc)(void);
 typedef struct {const char *name; TestFunc func;} Test;
 
