@@ -43,7 +43,7 @@ typedef bool(*TestFunc)(void);
 typedef struct {const char *name; TestFunc func;} Test;
 
 /* ============ Assertions ============ */
-#define ASSERT(expr) __assert_cnt++; if (__options.verbose){putchar('.'); fflush(stdout);} if (! (expr)){printf("\033[31mASSERTION "#expr" failed\033[0m (%s:%d)\n", __FILE__, __LINE__); return false;}
+#define ASSERT(expr) __assert_cnt++; if (__options.verbose){putchar('.'); fflush(stdout);} if (! (expr)){printf("\033[31;1m%s:\033[0;31m ASSERTION ("#expr") failed\033[0m (%s:%d)\n", __func__, __FILE__, __LINE__); return false;}
 
 #define HAS_THROWED false
 #define ASSERT_THROWS(exc, expr) try {expr; ASSERT(HAS_THROWED);} catch (exc & err) {ASSERT(true);}
