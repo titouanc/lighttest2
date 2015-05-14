@@ -88,6 +88,6 @@ bool runTestSuite(Test *suite, unsigned long int n_tests)
 	return test_ok == n_tests;
 }
 
-#define SUITE(...) int main(int argc, const char **argv){Test suite[] = {__VA_ARGS__}; __parseOptions(argc, argv); return runTests(suite) != true;}
+#define SUITE(...) int main(int argc, const char **argv){Test suite[] = {__VA_ARGS__}; __parseOptions(argc, argv); printf("\033[1;33mRunning suite\033[0m \033[33m%s\033[0m\n", __options.name); return runTests(suite) != true;}
 
 #endif
