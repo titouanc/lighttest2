@@ -16,14 +16,16 @@ All you need is to `wget https://raw.githubusercontent.com/titouanc/lighttest2/m
 
 Here's a small example. Hey look, that's valid C !
 
-	#include "lighttest2.h"
+```C
+#include "lighttest2.h"
 
-	TEST(the_answer, {
-		int the_answer = 42;
-		ASSERT(the_answer == 42);
-	})
+TEST(the_answer_is_42, {
+	int the_answer = 42;
+	ASSERT(the_answer == 42);
+})
 
-	SUITE(ADDTEST(the_answer))
+SUITE(ADDTEST(the_answer_is_42))
+```
 
 As you can imagine, this concise syntax is achieved with black-magic macros, that implies the following limitations:
 
@@ -53,6 +55,7 @@ And, yes, it has COL0RZ !!!
 ### Command line options
 
 * `-v` or `--verbose`: prints informations for each test
+* `-f` of `--fail`: fail whole suite on first failing test
 
 ## API
 

@@ -24,8 +24,9 @@ static inline bool streq(const char *s1, const char *s2)
 static unsigned long int __assert_cnt = 0;
 static struct {
 	bool verbose;
+	bool fail;
 	const char *name;
-} __options = {false, ""};
+} __options = {false, false, ""};
 
 void __parseOptions(int argc, const char **argv)
 {
@@ -33,6 +34,8 @@ void __parseOptions(int argc, const char **argv)
 	for (int i=1; i<argc; i++){
 		if (streq(argv[i], "-v") || streq(argv[i], "--verbose"))
 			__options.verbose = true;
+		else if (streq(argv[i], "-f") || streq(argv[i], "--fail"))
+			__options.fail = true;
 	}
 }
 
@@ -55,7 +58,10 @@ typedef struct {const char *name; TestFunc func;} Test;
 bool runTestSuite(Test *suite, unsigned long int n_tests)
 {
 	unsigned long int test_ok = 0;
+	unsigned long int test_ran = 0;
+	unsigned long int test_fail = 0;
 	for (unsigned long int i=0; i<n_tests; i++){
+		test_ran++;
 		if (__options.verbose){
 			int test_name_len = strlen(suite[i].name);
 			int padding_len = TERMINAL_WIDTH - 10 - test_name_len;
@@ -68,8 +74,15 @@ bool runTestSuite(Test *suite, unsigned long int n_tests)
 				putchar('-');
 			putchar('\n');
 		}
+
 		if (suite[i].func())
 			test_ok++;
+		else {
+			test_fail++;
+			if (__options.fail)
+				break;
+		}
+
 		if (__options.verbose){
 			putchar('\n');
 			for (int j=0; j<TERMINAL_WIDTH; j++)
@@ -77,9 +90,9 @@ bool runTestSuite(Test *suite, unsigned long int n_tests)
 			putchar('\n');
 		}
 	}
-	printf("\033[1mRan %lu tests | \033[32m%lu OK", n_tests, test_ok);
+	printf("\033[1mRan %lu tests | \033[32m%lu OK", test_ran, test_ok);
 	if (test_ok != n_tests)
-		printf("  \033[31m%lu FAILS", n_tests - test_ok);
+		printf("  \033[31m%lu FAILS", test_fail);
 	printf("\033[0;1m | \033[0m%lu assertions\n", __assert_cnt);
 	printf("\033[1;3%dm", (test_ok == n_tests) ? 2 : 1);
 	for (int i=0; i<TERMINAL_WIDTH; i++)
